@@ -1,28 +1,33 @@
+
 // =========================
 // MOBILE MENU
 // =========================
 
 const menuButton = document.getElementById("menuButton");
 const navLinks = document.getElementById("navLinks");
+const menuIcon = menuButton.querySelector("i");
+
+function closeMobileMenu() {
+    navLinks.classList.remove("show");
+
+    menuIcon.classList.remove("fa-xmark");
+    menuIcon.classList.add("fa-bars");
+
+    menuButton.setAttribute("aria-expanded", "false");
+    menuButton.setAttribute("aria-label", "Open menu");
+}
 
 menuButton.addEventListener("click", () => {
+    const isOpen = navLinks.classList.toggle("show");
 
-    navLinks.classList.toggle("show");
+    menuIcon.classList.toggle("fa-bars", !isOpen);
+    menuIcon.classList.toggle("fa-xmark", isOpen);
 
-    const icon = menuButton.querySelector("i");
-
-    if (navLinks.classList.contains("show")) {
-
-        icon.classList.remove("fa-bars");
-        icon.classList.add("fa-xmark");
-
-    } else {
-
-        icon.classList.remove("fa-xmark");
-        icon.classList.add("fa-bars");
-
-    }
-
+    menuButton.setAttribute("aria-expanded", String(isOpen));
+    menuButton.setAttribute(
+        "aria-label",
+        isOpen ? "Close menu" : "Open menu"
+    );
 });
 
 
@@ -32,19 +37,19 @@ menuButton.addEventListener("click", () => {
 
 const links = document.querySelectorAll(".nav-links a");
 
-links.forEach(link => {
+links.forEach((link) => {
+    link.addEventListener("click", closeMobileMenu);
+});
 
-    link.addEventListener("click", () => {
 
-        navLinks.classList.remove("show");
+// =========================
+// RESET MENU ON RESIZE
+// =========================
 
-        const icon = menuButton.querySelector("i");
-
-        icon.classList.remove("fa-xmark");
-        icon.classList.add("fa-bars");
-
-    });
-
+window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) {
+        closeMobileMenu();
+    }
 });
 
 
@@ -52,40 +57,39 @@ links.forEach(link => {
 // ACTIVE NAV LINK
 // =========================
 
-const sections = document.querySelectorAll("section[id]");
+const sections = document.querySelectorAll("main section[id]");
 
-window.addEventListener("scroll", () => {
-
+function updateActiveNavLink() {
     const scrollPosition = window.scrollY + 150;
 
-    sections.forEach(section => {
-
+    sections.forEach((section) => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.offsetHeight;
-        const sectionId = section.getAttribute("id");
+        const sectionBottom = sectionTop + section.offsetHeight;
 
         if (
             scrollPosition >= sectionTop &&
-            scrollPosition < sectionTop + sectionHeight
+            scrollPosition < sectionBottom
         ) {
-
-            links.forEach(link => {
+            links.forEach((link) => {
                 link.classList.remove("active");
             });
 
             const activeLink = document.querySelector(
-                `.nav-links a[href="#${sectionId}"]`
+                `.nav-links a[href="#${section.id}"]`
             );
 
             if (activeLink) {
                 activeLink.classList.add("active");
             }
-
         }
-
     });
+}
 
+window.addEventListener("scroll", updateActiveNavLink, {
+    passive: true
 });
+
+window.addEventListener("load", updateActiveNavLink);
 
 
 // =========================
@@ -94,20 +98,18 @@ window.addEventListener("scroll", () => {
 
 const header = document.querySelector(".header");
 
-window.addEventListener("scroll", () => {
+function updateHeaderShadow() {
+    header.style.boxShadow =
+        window.scrollY > 50
+            ? "0 8px 30px rgba(0, 0, 0, 0.2)"
+            : "none";
+}
 
-    if (window.scrollY > 50) {
-
-        header.style.boxShadow =
-            "0 8px 30px rgba(0, 0, 0, 0.2)";
-
-    } else {
-
-        header.style.boxShadow = "none";
-
-    }
-
+window.addEventListener("scroll", updateHeaderShadow, {
+    passive: true
 });
+
+updateHeaderShadow();
 
 
 // =========================
@@ -116,18 +118,11 @@ window.addEventListener("scroll", () => {
 
 const projectLinks = document.querySelectorAll(".project-link");
 
-projectLinks.forEach(link => {
-
+projectLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
-
         if (link.getAttribute("href") === "#") {
-
             event.preventDefault();
-
             alert("Project link will be added soon.");
-
         }
-
     });
-
 });
